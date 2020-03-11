@@ -4,7 +4,7 @@ import CartHeader from './CartHeader.js';
 import CartFooter from './CartFooter.js';
 import CartItems from './CartItems.js';
 import AddItem from './AddItem.js';
-
+import CartTotalPrice from './CartTotalPrice.js';
 
 class App extends React.Component{
 
@@ -29,10 +29,30 @@ class App extends React.Component{
       ]
     }
   }
+  
+  increaseItemQuantity = (prevState, newItem) => {
+    return ({
+      cartItemsList: prevState.cartItemsList.map(item => {
+        if(item.product.id === newItem.product.id){
+          item.quantity += newItem.quantity;
+        }
+        return item;
+      })
+    })
+  }
 
-  addItem = (item) => {
+  addNewItem = (prevState, newItem) => {
+    const newId = prevState.cartItemsList.length + 1;
+    newItem.id = newId;
+    return ({
+      cartItemsList: prevState.cartItemsList.concat(newItem)
+    })
+  }
+  
+  addItem = (newItem) => {
     this.setState(prevState => {
-      cartItemsList: prevState.cartItemsList.concat(item);
+      const itemExists = prevState.cartItemsList.filter(item => item.product.id === newItem.product.id).length > 0;
+      return itemExists ? this.increaseItemQuantity(prevState, newItem) : this.addNewItem(prevState,newItem);
     });
   }
 
@@ -41,9 +61,9 @@ class App extends React.Component{
       <div>
         <CartHeader />
         <CartItems items={this.state.cartItemsList}/>
+        <CartTotalPrice totalPriceInCents={this.state.cartItemsList.reduce((price,item) => price + (item.quantity * item.product.priceInCents),0)}/>
         <AddItem onSubmitPressed={this.addItem} products={this.state.products}/>
         <CartFooter copyright="2020"/>
-        
       </div>
     )
   }

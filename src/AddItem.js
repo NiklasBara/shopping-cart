@@ -6,16 +6,14 @@ class AddItem extends React.Component{
 
   constructor(props){
     super(props);
-    this.state = {
-      products : props.products
-    }
-
+    this.state = {}
   }
 
   onSubmit = (e) =>{
-    console.log(e, e.target, e.target.value);
     e.preventDefault();
-    this.props.onSubmitPressed(e.target.value);
+    if(this.state.product && !isNaN(this.state.quantity)){
+      this.props.onSubmitPressed(this.state);
+    }
   } 
 
   //TODO ADD ON CHANGE TO THE FORM
@@ -23,12 +21,11 @@ class AddItem extends React.Component{
     return (
       <form onSubmit={this.onSubmit}>
         <label>Quantity</label>
-        
-        <input type="textfield"></input>
+        <input type="textfield" onChange={e => this.setState({quantity: Number(e.target.value)})}></input>
         <label>Products</label>
-        <select id="cars" name="cars">
-          <option value="default" selected>Please select an Option...</option>
-          {this.state.products.map( product => <option value={product.name}>{product.name}</option>)}
+        <select id="cars" name="cars" onChange={e => this.setState({product: this.props.products.filter(p => p.id === Number(e.target.value))[0]})}>
+          <option value="default">Please select an Option...</option>
+          {this.props.products.map( product => <option key={product.id} value={product.id}>{product.name}</option>)}
         </select>
         <button type="submit">Submit</button>
       </form>
